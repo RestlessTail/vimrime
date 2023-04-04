@@ -1,4 +1,4 @@
-function! ParseJSON(str)
+function! vimrime_minijson#ParseJSON(str)
 	let s:rawJson = a:str
 	let s:pos = 0
 	return ParsePrimary()
