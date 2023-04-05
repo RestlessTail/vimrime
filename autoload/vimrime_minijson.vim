@@ -1,64 +1,68 @@
+"将JSON字符串解析为vim对象
+"这是JSON的一个子集，不能有空格，只支持对象、列表、字符串和整数
+"不要用在别的地方！
+
 function! vimrime_minijson#ParseJSON(str)
 	let s:rawJson = a:str
 	let s:pos = 0
-	return ParsePrimary()
+	return s:ParsePrimary()
 endfunction
 
-function! ParsePrimary()
+function! s:ParsePrimary()
 	if s:rawJson[s:pos] == '{'
-		return ParseObject()
+		return s:ParseObject()
 	elseif s:rawJson[s:pos] == '['
-		return ParseArray()
+		return s:ParseArray()
 	elseif s:rawJson[s:pos] == '"'
-		return ParseString()
+		return s:ParseString()
 	else
-		return ParseNum()
+		return s:ParseNum()
 	endif
 endfunction
 
-function! ParseString()
+function! s:ParseString()
 	let s:pos += 1
-	let endPos = match(s:rawJson, '"', s:pos)
-	let ret = s:rawJson[s:pos:(endPos - 1)]
-	let s:pos = endPos + 1
-	return ret
+	let l:endPos = match(s:rawJson, '"', s:pos)
+	let l:ret = s:rawJson[s:pos:(l:endPos - 1)]
+	let s:pos = l:endPos + 1
+	return l:ret
 endfunction
 
-function! ParseNum()
-	let endPos = s:pos
-	while s:rawJson[endPos] != '}' && s:rawJson[endPos] != ',' 
-		let endPos = endPos + 1
+function! s:ParseNum()
+	let l:endPos = s:pos
+	while s:rawJson[l:endPos] != '}' && s:rawJson[l:endPos] != ',' 
+		let l:endPos = l:endPos + 1
 	endwhile
-	let ret = str2nr(s:rawJson[s:pos:(endPos - 1)])
-	let s:pos = endPos
-	return ret
+	let l:ret = str2nr(s:rawJson[s:pos:(l:endPos - 1)])
+	let s:pos = l:endPos
+	return l:ret
 endfunction
 
-function ParseObject()
+function s:ParseObject()
 	let s:pos += 1
-	let ret = {}
+	let l:ret = {}
 	while s:rawJson[s:pos] != '}'
-		let key = ParseString()
+		let l:key = s:ParseString()
 		let s:pos = s:pos + 1
-		let ret[key] = ParsePrimary()
+		let l:ret[l:key] = s:ParsePrimary()
 		if s:rawJson[s:pos] ==# ',' 
 			let s:pos = s:pos + 1
 		endif
 	endwhile
 	let s:pos = s:pos + 1
-	return ret
+	return l:ret
 endfunction
 
-function ParseArray()
+function s:ParseArray()
 	let s:pos += 1
-	let ret = []
+	let l:ret = []
 	while s:rawJson[s:pos] != ']'
-		call add(ret, ParsePrimary())
+		call add(ret, s:ParsePrimary())
 		if s:rawJson[s:pos] ==# ','
 			let s:pos = s:pos + 1
 		endif
 	endwhile
 	let s:pos = s:pos + 1
-	return ret
+	return l:ret
 endfunction
 

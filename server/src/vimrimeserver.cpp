@@ -1,6 +1,5 @@
 /*
  * A modification of rime_api_console.cc
- * 2023-04-03 RestlessTail <1826930551@qq.com>
  *
  * Copyright RIME Developers
  * Distributed under the BSD License
